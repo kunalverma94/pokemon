@@ -80,8 +80,8 @@
         function tmz() {
             let o = new Date(t);
             let n = new Date();
-            let m = (n.getMinutes() - o.getMinutes());
-            let s = (n.getSeconds() - o.getSeconds());
+            let m = Math.abs((n.getMinutes() - o.getMinutes()));
+            let s = Math.abs(n.getSeconds() - o.getSeconds());
             return m + ' : ' + s
 
         }
