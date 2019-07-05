@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        .banner {
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 120, 212, 1);
+            line-height: 29px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            right: 0;
+            font-family: monospace;
+            height: 30px;
+            display: flex;
+
+        }
+
+        div#selector>div {
+            flex-basis: 30%;
+        }
+
+        /* .banner {
+            text-align: center;
+            width: 300px;
+            color: #fff;
+            background: #e43;
+            line-height: 29px;
+            position: fixed;
+            left: -96px;
+            top: 34px;
+            z-index: 1;
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+            animation: diss 2s linear 1; 
+            opacity: 0;
+
+        } */
+
+        @keyframes diss {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="banner" id="selector">
+        <div>Time :<span id="time">0</span></div>
+        <div>ShittyGames ©</div>
+        <div>Score :<span id="score">0</span></div>
+    </div>
+    <img src="./a.jpg" style="display: none">
+    <canvas id="main">
+
+    </canvas>
+
+    <script>
+        var t = (new Date()) + '';
+        function tmz() {
+            let o = new Date(t);
+            let n = new Date();
+            let m = (n.getMinutes() - o.getMinutes());
+            let s = (n.getSeconds() - o.getSeconds());
+            return m + ' : ' + s
+
+        }
+        var d = undefined;
+
+        var cc = document.getElementsByTagName("canvas")[0];
+        var c = cc.getContext('2d');
+        var
+            h = innerHeight,
+            w = innerWidth, o, s, fw = 60;
+        window.onkeydown = function (e) {
+            let dd = e.key;
+            if (dd.search("Arrow") > -1 || dd == '1') {
+                d = e.key;
+            }
+            if (dd == 'i' || dd == 'I') {
+                console.log('inc');
+                fw -= 10;
+            }
+            if (dd == 'd' || dd == 'D') {
+                console.log('inc');
+                fw += 10;
+            }
+        }
+        function coll(rect1, rect2) {
+            if (rect1.x < rect2.x + rect2.w &&
+                rect1.x + rect1.w > rect2.x &&
+                rect1.y < rect2.y + rect2.h &&
+                rect1.h + rect1.y > rect2.y) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function snake() {
+            this.w = 15
+            this.h = 15
+            this.dx = 1;
+            this.dy = 1;
+            this.xf = 1;
+            this.yf = 1;
+            this.sn = [{ x: 20, y: h / 2 }];
+            this.draw = function () {
+                let q = d && d.search("Arrow") > -1 || d != '1';
+                let n = true;
+                let ss = { ...this.sn[0] };
+                if (d == "ArrowUp") ss.y -= this.h;
+                if (d == "ArrowDown") ss.y += this.h;
+                if (d == "ArrowLeft") ss.x -= this.w;
+                if (d == "ArrowRight") ss.x += this.w;
+                if (ss.x >= w) {
+                    ss.x = 0;
+                }
+                else if (ss.x < 0) {
+                    ss.x = w - this.w;
+                }
+                if (ss.y >= h) {
+                    ss.y = 0;
+                }
+                else if ((ss.y + this.h / 2) < 30) {
+                    ss.y = h;
+
+                }
+                n = coll({ ...this.sn[0], h: this.h, w: this.w }, o);
+                this.sn.forEach((s, i, aa) => {
+                    if (i == 0 || aa.length - 1 == i) {
+                        var my_gradient = c.createLinearGradient(s.x, s.y, s.x + this.w, s.y + this.h);
+                        if (aa.length - 1 == i) {
+                            my_gradient.addColorStop(0, "black");
+                            my_gradient.addColorStop(1, "#8BC34A");
+                        }
+                        else {
+                            my_gradient.addColorStop(0, "#8BC34A");
+                            my_gradient.addColorStop(1, "white");
+
+                        }
+                        c.fillStyle = my_gradient;
+                    } else
+                        c.fillStyle = '#8BC34A';
+                    c.fillRect(s.x, s.y, this.w, this.h);
+                    c.strokeStyle = '#E91E63';
+                    c.font = '30px serif';
+                    c.strokeStyle = '#9E9E9E';
+                    if (aa.length - 1 != i && i != 0)
+                        c.strokeRect(s.x, s.y, this.w, this.h);
+                    if (i == 0) {
+                        c.beginPath();
+                        c.fillStyle = '#F44336';
+                        c.arc(s.x + 10, s.y + 2, 5, 360, 0);
+                        c.fill();
+
+                    }
+                    c.arc(s.x + 10, s.y + 2, 5, 360, 0);
+                    c.fill();
+                    c.beginPath();
+
+                });;
+                if (q) {
+                    this.sn.unshift(ss);
+                    if (n) {
+                        o.renew();
+                        document.getElementById("score").innerText = Number(document.getElementById("score").innerText) + 1;
+                        return
+                    }
+                    if (this.sn.length > 10) {
+                        this.sn.pop();
+                    }
+                }
+            }
+        }
+        function gc() {
+            var s = "0123456789ABCDEF";
+            var c = "#";
+            for (var i = 0; i < 6; i++) {
+                c += s[Math.ceil(Math.random() * 15)]
+            }
+            return c
+        }
+
+        function food() {
+            this.x = 0
+            this.y = 0
+            this.w = 10
+            this.h = 10
+            // this.dx = 20;
+            // this.dy = 20;
+            // this.dr = 2;
+            this.color = gc();
+            console.log(this, w, h);
+            this.renew = function () {
+                this.x = Math.floor(Math.random() * (w - 200) + 10);
+                this.y = Math.floor(Math.random() * (h - 200) + 30);
+                this.color = gc();
+
+            }
+            this.renew();
+            this.put = () => {
+                c.fillStyle = this.color;
+                c.fillRect(this.x, this.y, this.w, this.h);
+            }
+        }
+        function init() {
+            cc.height = h;
+            cc.width = w;
+            c.fillRect(0, 0, w, innerHeight)
+            o = new food();
+            s = new snake(w / 2, h / 2, 400, 4, 4)
+            o.put();
+            anima();
+
+        }
+        function anima() {
+            c.fillStyle = "rgba(0,0,0,0.11)";
+            c.fillRect(0, 0, cc.width, cc.height);
+            //c.clearRect(0, 0, cc.width, cc.height);
+            o.put();
+            s.draw();
+            document.getElementById("time").innerText = tmz();
+            setTimeout(() => {
+                requestAnimationFrame(anima);
+            }, fw);
+        }
+        init();
+    </script>
+</body>
+
+</html>
