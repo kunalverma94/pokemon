@@ -101,7 +101,7 @@
                 fw -= 10;
             }
             if (dd == 'd' || dd == 'D') {
-                console.log('inc');
+                console.log('dec');
                 fw += 10;
             }
         }
@@ -138,12 +138,11 @@
                 else if (ss.x < 0) {
                     ss.x = w - this.w;
                 }
-                if (ss.y >= h) {
+                if (ss.y > h) {
                     ss.y = 0;
                 }
-                else if ((ss.y + this.h / 2) < 30) {
+                else if (ss.y < 0) {
                     ss.y = h;
-
                 }
                 n = coll({ ...this.sn[0], h: this.h, w: this.w }, o);
                 this.sn.forEach((s, i, aa) => {
@@ -210,7 +209,6 @@
             // this.dy = 20;
             // this.dr = 2;
             this.color = gc();
-            console.log(this, w, h);
             this.renew = function () {
                 this.x = Math.floor(Math.random() * (w - 200) + 10);
                 this.y = Math.floor(Math.random() * (h - 200) + 30);
