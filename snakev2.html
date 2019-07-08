@@ -1,0 +1,137 @@
+<html>
+
+<head>
+    <title>Lite snake</title>
+</head>
+
+<body>
+</body>
+<style>
+    body {
+        background: black;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        box-shadow: inset 0px 0px 0px 5px #2196F3;
+    }
+</style>
+<canvas id="cc">
+</canvas>
+<script>
+    var cc = document.querySelector("canvas");
+    var h = innerHeight, w = innerWidth, s = null, cm = null, foods = [];
+    var c = cc.getContext('2d');
+    document.onkeydown = function (e) {
+        cm = e.keyCode;
+    }
+    const en = {
+        border: 5
+    }
+    function coll(rect1, rect2) {
+        if (rect1.x < rect2.x + rect2.w &&
+            rect1.x + rect1.w > rect2.x &&
+            rect1.y < rect2.y + rect2.h &&
+            rect1.h + rect1.y > rect2.y) {
+            return true;
+        }
+        return false;
+    }
+    function snake() {
+        this.b = 20;
+        this.sn = [];
+        {
+            let p = {
+                x: w / 2,
+                y: h / 2,
+                h: this.b,
+                w: this.b,
+            };
+            for (let i = 0; i < 5; i++) {
+                this.sn.push(Object.assign({}, p));
+                p.x += this.b;
+
+            }
+        }
+        this.drr = () => {
+            c.fillStyle = '#8BC34A';
+            c.strokeStyle = 'red';
+            if (cm >= 37 && cm <= 40) {
+                let n = { ...this.sn[0] };
+                if (cm === 37) n.x -= this.b;
+                if (cm === 38) n.y -= this.b;
+                if (cm === 39) n.x += this.b;
+                if (cm === 40) n.y += this.b;
+                this.sn.unshift(n);
+                let cc = foods.findIndex(y => coll(n, y));
+                if (cc === -1) {
+                    this.sn.pop();
+                } else {
+                    foods.splice(cc, 1);
+                    foods.push(new food());
+                }
+                if (n.x <= 0) {
+                    n.x = w - this.b;
+                } else if (n.x >= w) {
+                    n.x = 1;
+                }
+                if (n.y <= 0) {
+                    n.y = h - 1;
+                } else if (n.y >= h) {
+                    n.y = 1;
+                }
+            }
+
+            this.sn.forEach((e, i) => {
+                c.fillRect(e.x, e.y, this.b, this.b);
+                c.strokeText(i, e.x + 10, e.y + 12);
+            });
+
+        }
+    }
+    function food() {
+        this.x = 0;
+        this.y = 0;
+        this.b = 10;
+        this.h = this.b;
+        this.w = this.b;
+        this.renew = () => {
+            this.x = Math.floor(Math.random() * (w - 20)) + 20;
+            this.y = Math.floor(Math.random() * (h - 20)) + 20;
+        }
+        this.renew();
+        this.put = () => {
+            c.fillStyle = '#F44336';
+            c.arc(this.x, this.y, this.b, 0, Math.PI * 2);
+            c.fill();
+            c.beginPath();
+            c.arc(this.x, this.y, this.b, 0, Math.PI);
+            c.strokeStyle = 'green';
+            c.lineWidth = 10;
+            c.stroke();
+            c.beginPath();
+            c.lineWidth = 1;
+
+        }
+    }
+    function init() {
+        cc.height = h;
+        cc.width = w;
+        s = new snake();
+        foods.push(new food());
+        foods.push(new food());
+        foods.push(new food());
+        loop();
+
+    }
+    function loop() {
+        c.clearRect(0, 0, w, h)
+        foods.forEach(p => p.put());
+        s.drr();
+        setTimeout(() => {
+            requestAnimationFrame(loop);
+        }, 120);
+    } init();
+</script>
+
+</html>
