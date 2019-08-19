@@ -16,7 +16,7 @@
         .banner {
             text-align: center;
             color: #fff;
-            background: rgba(0, 120, 212, 1);
+            background:#3F51B5;
             line-height: 29px;
             position: fixed;
             left: 0;
@@ -24,15 +24,18 @@
             right: 0;
             font-family: monospace;
             height: 30px;
+    opacity: 0.4;
             display: flex;
-
+            transition: 0.5s;
         }
-
+        .banner:hover {
+    opacity: 1;
+}
         div#selector>div {
             flex-basis: 30%;
         }
 
-        /* .banner {
+        /* .banner-strip {
             text-align: center;
             width: 300px;
             color: #fff;
@@ -61,19 +64,65 @@
                 opacity: 0;
             }
         }
+        .keypress>div {
+    border: dashed 3px white;
+    height: 48%;
+    width: 48%;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+    font-size: -webkit-xxx-large;
+    font-weight: 900;
+    color: white;
+    transition: 0.5s;
+    opacity: 0.1;
+    border-radius: 7px;
+}
+.keypress {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    opacity: 1;
+    user-select: none;
+}
+.keypress>div:hover{
+    opacity: 1;
+}.touch {
+    background: #8bc34a;
+}
+.off{
+    background: #f44336;
+}
+.hide{
+    opacity: 0;
+}
     </style>
 </head>
 
 <body>
+        <div class="keypress" >
+                <div class="up" onclick="emit(38)" >&#8593;</div>
+                <div class="right"  onclick="emit(39)">&#8594;</div>
+                <div class="left"  onclick="emit(37)">&#8592;</div>
+                <div class="down"  onclick="emit(40)">&#8595;</div>
+            </div>
     <div class="banner" id="selector">
         <div>Time :<span id="time">0</span></div>
         <div>ShittyGames ©</div>
         <div>Score :<span id="score">0</span></div>
+        <div class="touch" onclick="touch(this)" >touch</div>
     </div>
     <canvas id="main">
 
     </canvas>
-
+  
     <script>
         var t = (new Date()) + '';
         function tmz() {
@@ -88,11 +137,56 @@
 
         var cc = document.getElementsByTagName("canvas")[0];
         var c = cc.getContext('2d');
+        
+        key = {};
+            key.keydown = function(k) {
+                var oEvent = document.createEvent('KeyboardEvent');
+            
+                // Chromium Hack
+                Object.defineProperty(oEvent, 'keyCode', {
+                            get : function() {
+                                return this.keyCodeVal;
+                            }
+                });    
+                Object.defineProperty(oEvent, 'key', {
+                            get : function() {
+                                       if (this.keyCodeVal==37)return  "ArrowLeft" ;
+            else if(this.keyCodeVal==38) return "ArrowUp";
+            else if(this.keyCodeVal==39) return "ArrowRight";
+            else return "ArrowDown"
+                               
+                            }
+                });  
+                Object.defineProperty(oEvent, 'which', {
+                            get : function() {
+                                return this.keyCodeVal;
+                            }
+                });     
+            
+                if (oEvent.initKeyboardEvent) {
+                    oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, false, false, false, false, k, k);
+                } else {
+                    oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+                }
+            
+                oEvent.keyCodeVal = k;
+            
+                if (oEvent.keyCode !== k) {
+                    alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+                }
+            
+                document.dispatchEvent(oEvent);
+            }
         var
             h = innerHeight,
             w = innerWidth, o, s, fw = 60, fa = [];
         window.onkeydown = function (e) {
             let dd = e.key;
+            // console.log(e);
+            // if (dd.keyCodeVal==37)d = "ArrowLeft" ;
+            // else if(dd.keyCodeVal==38) d = "ArrowUp";
+            // else if(dd.keyCodeVal==39) d = "ArrowRight";
+            // else d = "ArrowDown"
             if (dd.search("Arrow") > -1 || dd == '1') {
                 d = e.key;
             }
@@ -264,6 +358,16 @@
             }, fw);
         }
         init();
+      
+      
+function emit(v) {
+    key.keydown(v);
+}
+function touch(e) {
+e.classList.toggle("off");
+document.getElementsByClassName("keypress")[0].classList.toggle("hide");
+}
+    
     </script>
 </body>
 
